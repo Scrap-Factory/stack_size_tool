@@ -94,7 +94,11 @@ fn gen_set(path: String, folder: &Folder) -> Result<(), SetGenError> {
 
             for mut data in vec.clone() {
                 data["stackSize"] = Value::Number(Number::from_f64(STACK_SZIE).unwrap());
-                fs::write(&path, data.to_string())
+                let json = serde_json::to_string_pretty(&data)
+                    .into_report()
+                    .change_context(SetGenError)
+                    .attach_printable(format!("Failed to convert to pretty json"))?;
+                fs::write(&path, json)
                     .into_report()
                     .change_context(SetGenError)
                     .attach_printable(format!("Failed to write to {path}"))?;
