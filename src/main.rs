@@ -81,8 +81,12 @@ fn gen_set(path: String, folder: &Folder) -> Result<(), SetGenError> {
     let set = Set::from_file(&path)
         .change_context(SetGenError)
         .attach_printable(format!("Failed to parse set {path}"))?;
-
+    let mut file = Set {
+        block_list: None,
+        part_list: None,
+    };
     for entry in folder.entries {
+        let mut objects = Vec::new();
         if entry.is_empty() {
             continue;
         }
@@ -90,20 +94,25 @@ fn gen_set(path: String, folder: &Folder) -> Result<(), SetGenError> {
         let data = &set[entry];
 
         if let Some(vec) = data {
-            if !vec.is_empty() {}
-
             for mut data in vec.clone() {
                 data["stackSize"] = Value::Number(Number::from_f64(STACK_SZIE).unwrap());
-                let json = serde_json::to_string_pretty(&data)
-                    .into_report()
-                    .change_context(SetGenError)
-                    .attach_printable(format!("Failed to convert to pretty json"))?;
-                fs::write(&path, json)
-                    .into_report()
-                    .change_context(SetGenError)
-                    .attach_printable(format!("Failed to write to {path}"))?;
+
+                objects.push(data)
             }
         }
+
+        file.set_entry(entry, objects);
     }
+
+    let json = serde_json::to_string_pretty(&file)
+        .into_report()
+        .change_context(SetGenError)
+        .attach_printable(format!("Failed to convert {file:#?} to json"))?;
+
+    fs::write(&path, json)
+        .into_report()
+        .change_context(SetGenError)
+        .attach_printable(format!("Failed to write to file {path}"))?;
+
     Ok(())
 }
