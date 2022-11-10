@@ -22,8 +22,8 @@ impl Index<&str> for Set {
 
     fn index(&self, index: &str) -> &Self::Output {
         match index {
-            "part_lst" => &self.part_list,
-            "block_lst" => &self.block_list,
+            "part_list" => &self.part_list,
+            "block_list" => &self.block_list,
             _ => &self.part_list,
         }
     }

@@ -85,23 +85,23 @@ fn gen_set(path: String, folder: &Folder) -> Result<(), SetGenError> {
         block_list: None,
         part_list: None,
     };
+
     for entry in folder.entries {
-        let mut objects = Vec::new();
         if entry.is_empty() {
             continue;
         }
 
         let data = &set[entry];
-
         if let Some(vec) = data {
+            let mut objects = Vec::new();
+
             for mut data in vec.clone() {
                 data["stackSize"] = Value::Number(Number::from_f64(STACK_SZIE).unwrap());
 
                 objects.push(data)
             }
+            file.set_entry(entry, objects);
         }
-
-        file.set_entry(entry, objects);
     }
 
     let json = serde_json::to_string_pretty(&file)
