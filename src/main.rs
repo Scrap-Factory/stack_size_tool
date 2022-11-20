@@ -18,7 +18,7 @@ const FOLDERS: [Folder; 1] = [Folder {
     set_entry: None,
 }];
 
-const STACK_SZIE: f64 = 999.0;
+const STACK_SZIE: f64 = u16::MAX as f64;
 
 fn main() {
     simple_logger::SimpleLogger::new()
